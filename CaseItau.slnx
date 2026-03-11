@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CaseItau.API/CaseItau.API.csproj" />
+    <Project Path="src/CaseItau.Application/CaseItau.Application.csproj" />
+    <Project Path="src/CaseItau.Domain/CaseItau.Domain.csproj" />
+    <Project Path="src/CaseItau.Infra/CaseItau.Infra.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CaseItau.Tests/CaseItau.Tests.csproj" />
+  </Folder>
+</Solution>
