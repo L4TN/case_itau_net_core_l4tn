@@ -36,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IMovimentacaoService, MovimentacaoService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+        services.AddSingleton<ITokenCryptoService, TokenCryptoService>();
 
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
@@ -45,6 +46,8 @@ public static class DependencyInjection
         var jwtKey = configuration["Jwt:Key"]!;
         var issuer = configuration["Jwt:Issuer"]!;
         var audience = configuration["Jwt:Audience"]!;
+
+        var tokenCrypto = new TokenCryptoService(configuration);
 
         services.AddAuthentication(options =>
         {
@@ -63,6 +66,26 @@ public static class DependencyInjection
                 ValidAudience = audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
                 ClockSkew = TimeSpan.Zero
+            };
+
+            options.Events = new JwtBearerEvents
+            {
+                OnMessageReceived = context =>
+                {
+                    var authHeader = context.Request.Headers.Authorization.FirstOrDefault();
+                    if (authHeader is not null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var encryptedToken = authHeader["Bearer ".Length..].Trim();
+                        try
+                        {
+                            context.Token = tokenCrypto.Decrypt(encryptedToken);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                    return Task.CompletedTask;
+                }
             };
         });
 
