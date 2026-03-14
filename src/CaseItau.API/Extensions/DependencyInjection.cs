@@ -1,4 +1,5 @@
 using System.Text;
+using CaseItau.API.Services;
 using CaseItau.Application.Mappings;
 using CaseItau.Application.Services;
 using CaseItau.Application.Services.Interfaces;
@@ -11,6 +12,7 @@ using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 namespace CaseItau.API.Extensions;
 
@@ -42,6 +44,21 @@ public static class DependencyInjection
 
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<CreateFundoValidator>();
+
+        var redisConnectionString = configuration["Redis:ConnectionString"] ?? "localhost:6379";
+        var redisEnabled = configuration.GetValue<bool>("Redis:Enabled");
+        if (redisEnabled)
+        {
+            services.AddSingleton<IConnectionMultiplexer>(
+                ConnectionMultiplexer.Connect(redisConnectionString));
+        }
+        else
+        {
+            services.AddSingleton<IConnectionMultiplexer>(
+                ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false"));
+        }
+
+        services.AddSingleton<IRedisCacheService, RedisCacheService>();
 
         var jwtKey = configuration["Jwt:Key"]!;
         var issuer = configuration["Jwt:Issuer"]!;
