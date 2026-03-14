@@ -1,8 +1,34 @@
+using AWS.Logger;
+using AWS.Logger.SeriLog;
 using CaseItau.API.Extensions;
 using CaseItau.API.Middlewares;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var awsCloudWatchEnabled = builder.Configuration.GetValue<bool>("AWS:CloudWatch:Enabled");
+
+var loggerConfig = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .Enrich.WithEnvironmentName()
+    .Enrich.WithThreadId()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff} {Level:u3}] {Message:lj} {Properties:j}{NewLine}{Exception}");
+
+if (awsCloudWatchEnabled)
+{
+    var awsLogConfig = new AWSLoggerConfig
+    {
+        LogGroup = builder.Configuration["AWS:CloudWatch:LogGroup"] ?? "/caseitau/api",
+        Region = builder.Configuration["AWS:CloudWatch:Region"] ?? "us-east-1"
+    };
+    loggerConfig.WriteTo.AWSSeriLog(awsLogConfig);
+}
+
+Log.Logger = loggerConfig.CreateLogger();
+
+builder.Host.UseSerilog();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -73,4 +99,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+app.UseSerilogRequestLogging();
+Log.Information("API Case Itau iniciada com sucesso.");
 app.Run();
