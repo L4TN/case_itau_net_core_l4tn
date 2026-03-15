@@ -33,14 +33,13 @@ services:
 
   api:
     build:
-      context: ./CaseItau_Backend
+      context: .
       dockerfile: src/CaseItau.API/Dockerfile
     container_name: caseitau-api
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=CaseItauDb;User Id=sa;Password=Itau@2024Strong;TrustServerCertificate=true;Encrypt=false;
-      - Database__ResetOnStartup=true
       - Redis__Enabled=true
       - Redis__ConnectionString=redis:6379
       - Redis__InstanceName=CaseItau_
@@ -52,16 +51,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-
-  frontend:
-    build:
-      context: ./CaseItau_FrontEnd
-      dockerfile: Dockerfile
-    container_name: caseitau-frontend
-    ports:
-      - "4200:80"
-    depends_on:
-      - api
 
 volumes:
   sqlserver_data:

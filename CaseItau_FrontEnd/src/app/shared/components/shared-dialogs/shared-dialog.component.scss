@@ -1,0 +1,80 @@
+// Tamanhos do card por modo
+.dialog-form {
+  min-width: 450px;
+  max-width: 700px;
+
+  nb-card-body {
+    max-height: 70vh;
+    overflow-y: auto;
+
+    &::-webkit-scrollbar {
+      width: 8px !important;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f0f0f0 !important;
+      border-radius: 4px !important;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: #888888 !important;
+      border-radius: 4px !important;
+
+      &:hover {
+        background-color: #666666 !important;
+      }
+    }
+  }
+}
+
+.dialog-confirm {
+  min-width: 400px;
+  max-width: 500px;
+}
+
+// Layout do formulário
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+}
+
+.form-group {
+  width: 100%;
+  margin-bottom: 1rem;
+
+  &.half-width {
+    width: calc(50% - 8px);
+  }
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+}
+
+.required {
+  color: #ff3d00;
+}
+
+.error-text {
+  color: #ff3d00;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.warning-text {
+  color: #ff3d00;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+nb-card-footer {
+  display: flex;
+  justify-content: center;
+}
+
+::ng-deep .input-error {
+  border-color: #ff3d00 !important;
+}

@@ -1,0 +1,58 @@
+<h1 class="title" style="text-align: center; margin-bottom: 24px;">Case Itaú Asset</h1>
+<p class="sub-title" style="text-align: center; margin-bottom: 20px;">Faça login para continuar</p>
+
+<nb-alert *ngIf="error" outline="danger" role="alert">
+  {{ error }}
+</nb-alert>
+
+<form (ngSubmit)="login()" #form="ngForm">
+
+  <div class="form-control-group">
+    <label class="label" for="input-usuario">Usuário:</label>
+    <input nbInput fullWidth
+           id="input-usuario"
+           name="usuario"
+           type="text"
+           placeholder="Usuário"
+           fieldSize="large"
+           autofocus
+           [(ngModel)]="usuario"
+           #usuarioField="ngModel"
+           [required]="true"
+           [status]="usuarioField.dirty ? (usuarioField.invalid ? 'danger' : 'success') : 'basic'"
+           autocomplete="username">
+    <p class="caption status-danger" *ngIf="usuarioField.invalid && usuarioField.touched">
+      Usuário é obrigatório.
+    </p>
+  </div>
+
+  <div class="form-control-group">
+    <label class="label" for="input-senha">Senha:</label>
+    <input nbInput fullWidth
+           id="input-senha"
+           name="senha"
+           type="password"
+           placeholder="Senha"
+           fieldSize="large"
+           [(ngModel)]="senha"
+           #senhaField="ngModel"
+           [required]="true"
+           [minlength]="4"
+           [status]="senhaField.dirty ? (senhaField.invalid ? 'danger' : 'success') : 'basic'"
+           autocomplete="current-password">
+    <p class="caption status-danger" *ngIf="senhaField.invalid && senhaField.touched">
+      Senha é obrigatória (mínimo 4 caracteres).
+    </p>
+  </div>
+
+  <button nbButton fullWidth
+          status="warning"
+          size="large"
+          type="submit"
+          [nbSpinner]="loading"
+          nbSpinnerStatus="control"
+          [disabled]="loading || form.invalid">
+    Entrar
+  </button>
+
+</form>
