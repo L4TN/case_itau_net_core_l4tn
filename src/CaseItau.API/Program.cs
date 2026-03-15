@@ -119,9 +119,15 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DboContext>();
-    db.Database.EnsureDeleted();
+
+    if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Database:ResetOnStartup"))
+    {
+        db.Database.EnsureDeleted();
+        Log.Warning("Banco deletado (Database:ResetOnStartup=true).");
+    }
+
     db.Database.Migrate();
-    Log.Information("Banco recriado e migrations aplicadas com sucesso.");
+    Log.Information("Migrations aplicadas com sucesso.");
 }
 
 if (app.Environment.IsDevelopment())
