@@ -1,64 +1,24 @@
-nb-auth nb-layout .layout {
-    background-image: url('/assets/images/login/itau-predio-fundo-login.jpg') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-color: #1a2138 !important;
-}
-
-nb-auth nb-layout .columns nb-layout-column {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-}
-
-nb-auth nb-card {
-    max-width: 380px !important;
-    width: 90% !important;
-    height: auto !important;
-    flex: none !important;
-    margin: 0 auto !important;
-    border-radius: 12px !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35) !important;
-    background: rgba(255, 255, 255, 0.95) !important;
-}
-
-nb-auth nb-card-header {
-    display: none !important;
-}
-
-nb-auth nb-card nb-card-body {
-    padding: 1.25rem 1.75rem !important;
-    flex: none !important;
-}
-
-nb-auth nb-auth-block {
-    padding: 0 !important;
-    margin: 0 !important;
-    min-height: unset !important;
-}
-
 .login-logo {
     text-align: center;
     margin-bottom: 0.5rem;
 
     img {
-        max-width: 160px;
-        max-height: 50px;
+        max-width: 140px;
+        max-height: 45px;
         object-fit: contain;
     }
 }
 
 .title {
     text-align: center;
-    margin-bottom: 0.25rem;
-    font-size: 1.1rem;
+    margin-bottom: 0.15rem;
+    font-size: 1rem;
 }
 
 .sub-title {
     text-align: center;
-    margin-bottom: 0.75rem;
-    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+    font-size: 0.8rem;
 }
 
 .label-with-link {
@@ -73,7 +33,7 @@ nb-auth nb-auth-block {
 }
 
 nb-alert {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
 
     .alert-title {
         margin: 0 0 0.25rem;
@@ -87,5 +47,5 @@ nb-alert {
 }
 
 .form-control-group {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.6rem;
 }

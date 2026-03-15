@@ -8,4 +8,45 @@
       right: 0.41rem !important;
     }
   }
+
+  nb-auth nb-layout .layout {
+    background-image: url('/assets/images/login/itau-predio-fundo-login.jpg') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-color: #1a2138 !important;
+  }
+
+  nb-auth nb-layout .columns nb-layout-column {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: transparent !important;
+  }
+
+  nb-auth nb-card {
+    max-width: 340px !important;
+    width: 85% !important;
+    height: auto !important;
+    flex: none !important;
+    margin: 0 auto !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+  }
+
+  nb-auth nb-card-header {
+    display: none !important;
+  }
+
+  nb-auth nb-card nb-card-body {
+    padding: 1rem 1.5rem !important;
+    flex: none !important;
+  }
+
+  nb-auth nb-auth-block {
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: unset !important;
+  }
 }
