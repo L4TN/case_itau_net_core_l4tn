@@ -19,8 +19,16 @@ public class FundoController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllFunds(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllFunds([FromQuery] int? page, [FromQuery] int? pageSize, CancellationToken cancellationToken)
     {
+        if (page.HasValue || pageSize.HasValue)
+        {
+            var pg = page ?? 1;
+            var ps = Math.Clamp(pageSize ?? 20, 1, 100);
+            var paged = await _fundoService.GetAllPagedAsync(pg, ps, cancellationToken);
+            return Ok(paged);
+        }
+
         var fundos = await _fundoService.GetAllAsync(cancellationToken);
         return Ok(fundos);
     }
