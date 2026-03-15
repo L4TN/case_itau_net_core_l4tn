@@ -14,13 +14,13 @@
       </div>
       <div class="form-group valor-group">
         <label class="label">Valor (positivo = aporte, negativo = resgate)</label>
-        <input nbInput type="number" fullWidth placeholder="Ex: 50000 ou -10000" [(ngModel)]="valor" (keydown)="onValorKeyDown($event)">
+        <input nbInput type="text" fullWidth placeholder="Ex: +50000 ou -10000" [(ngModel)]="valorTexto" (keydown)="onValorKeyDown($event)" inputmode="numeric">
       </div>
       <div class="form-group btn-group">
         <button nbButton status="info" [disabled]="!selectedFundoCodigo" (click)="consultar()">
           <nb-icon icon="search-outline"></nb-icon> Consultar
         </button>
-        <button nbButton status="primary" [disabled]="!selectedFundoCodigo || !valor" (click)="movimentar()">
+        <button nbButton status="primary" [disabled]="!selectedFundoCodigo || !valorTexto" (click)="movimentar()">
           <nb-icon icon="trending-up-outline"></nb-icon> Movimentar
         </button>
       </div>
