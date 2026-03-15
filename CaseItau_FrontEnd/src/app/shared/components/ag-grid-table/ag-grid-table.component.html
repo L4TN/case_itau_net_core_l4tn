@@ -36,6 +36,8 @@
     [suppressRowClickSelection]="false"
     [rowHeight]="48"
     [animateRows]="true"
+    [overlayLoadingTemplate]="overlayLoadingTemplate"
+    [overlayNoRowsTemplate]="overlayNoRowsTemplate"
     (gridReady)="onGridReady($event)"
     (selectionChanged)="onSelectionChanged()">
   </ag-grid-angular>

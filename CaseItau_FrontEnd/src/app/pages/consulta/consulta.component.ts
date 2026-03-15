@@ -17,6 +17,7 @@ export class ConsultaComponent implements OnInit {
   cacheRedis: boolean = true;
   cacheRedisFeatureEnabled: boolean = false;
   posicoes: PosicaoFundoResponse[] = [];
+  loadingGrid: boolean = false;
   chartOptions: EChartsOption = {};
 
   columnDefs: ColDef[] = [
@@ -60,8 +61,10 @@ export class ConsultaComponent implements OnInit {
 
   private loadEvolucao(): void {
     const useCache = this.cacheRedisFeatureEnabled && this.cacheRedis;
+    this.loadingGrid = true;
     this.movimentacaoApi.getEvolucaoPatrimonial(this.selectedFundoCodigo, useCache).subscribe(data => {
       this.posicoes = data;
+      this.loadingGrid = false;
       this.buildChart(data);
     });
   }
