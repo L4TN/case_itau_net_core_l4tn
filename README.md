@@ -43,16 +43,49 @@ Como dito acima, o modelo legado tinha apenas 2 tabelas (`TIPO_FUNDO` e `FUNDO`)
 
 O novo modelo normaliza os dados em 5 tabelas:
 
-```
-Tb_Tipo_Fundo          Tipos de fundo (RENDA FIXA, ACOES, MULTI MERCADO)
-  |
-  └── Tb_Fundo         Cadastro de fundos (codigo unico, CNPJ unico)
-        |
-        ├── Tb_Movimentacao_Fundo    Registro individual de cada aporte/resgate com data e valor
-        |
-        └── Tb_Posicao_Fundo         Posicao diaria do patrimonio com controle de concorrencia (RowVersion)
+```mermaid
+erDiagram
+    Tb_Tipo_Fundo ||--o{ Tb_Fundo : "1:N"
+    Tb_Fundo ||--o{ Tb_Movimentacao_Fundo : "1:N"
+    Tb_Fundo ||--o{ Tb_Posicao_Fundo : "1:N"
 
-Tb_Feature_Flag        Feature flags para toggle de funcionalidades (ex: cache Redis)
+    Tb_Tipo_Fundo {
+        int Id PK
+        varchar Nm_Tipo_Fundo
+    }
+
+    Tb_Fundo {
+        int Id PK
+        varchar Cd_Fundo UK
+        varchar Nm_Fundo
+        varchar Nr_Cnpj UK
+        int Id_Tipo_Fundo FK
+    }
+
+    Tb_Movimentacao_Fundo {
+        int Id PK
+        int Id_Fundo FK
+        datetime Dt_Movimentacao
+        decimal Vlr_Movimentacao
+    }
+
+    Tb_Posicao_Fundo {
+        int Id PK
+        int Id_Fundo FK
+        datetime Dt_Posicao
+        decimal Vlr_Patrimonio
+        timestamp Row_Version
+    }
+
+    Tb_Feature_Flag {
+        int Id PK
+        varchar Ds_Chave UK
+        bit Fl_Habilitado
+        varchar Ds_Descricao
+        nvarchar Json_Config
+        datetime Dt_Criacao
+        datetime Dt_Atualizacao
+    }
 ```
 
 **O que mudou em relação ao Case proposto: (MER)** 
@@ -85,10 +118,15 @@ CaseItau_FrontEnd/             -> Frontend Angular 15 (Nebular/ngx-admin)
 ```
 
 ### Fluxo de dependências:
-```
-API -> Application -> Domain
-Infra -> Domain
-Tests -> Application, Domain
+
+```mermaid
+graph LR
+    API --> Application
+    Application --> Domain
+    Infra --> Domain
+    API --> Infra
+    Tests --> Application
+    Tests --> Domain
 ```
 
 ---
