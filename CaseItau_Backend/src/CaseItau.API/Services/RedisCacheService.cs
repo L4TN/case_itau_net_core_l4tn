@@ -72,7 +72,7 @@ public class RedisCacheService : IRedisCacheService
             if (!result.HasValue)
                 return null;
 
-            return JsonSerializer.Deserialize<T>(result!);
+            return JsonSerializer.Deserialize<T>(result.ToString()!);
         }
         catch (Exception ex) when (ex is RedisConnectionException or RedisTimeoutException or BrokenCircuitException)
         {

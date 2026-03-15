@@ -10,7 +10,7 @@ O desafio consistia em receber um backend legado (.NET Core 3.1 com SQLite) cont
 
 ### 1. Refatoracao completa do backend
 
-O codigo legado tinha um unico controller com SQL inline, SQL Injection em todos os endpoints, connection leak, sem validacao, sem autenticacao, sem testes e sem arquitetura. Foi migrado para Clean Architecture com .NET 8 LTS, SQL Server, EF Core, JWT, Redis, testes unitarios e Docker.
+O codigo legado tinha um unico controller com SQL inline, SQL Injection em todos os endpoints, connection leak, sem validacao, sem autenticacao, sem testes e sem arquitetura. Foi migrado para Clean Architecture com .NET 10, SQL Server, EF Core, JWT, Redis, testes unitarios e Docker.
 
 ### 2. Bug corrigido
 
@@ -87,9 +87,9 @@ Tests -> Application, Domain
 
 | Categoria | Tecnologia |
 |---|---|
-| Runtime | .NET 8 (LTS — suporte ate nov/2026) |
+| Runtime | .NET 10 |
 | Banco de dados | SQL Server 2022 |
-| ORM | Entity Framework Core 8 com Fluent API |
+| ORM | Entity Framework Core 10 com Fluent API |
 | Autenticacao | JWT Bearer com criptografia AES-256-CBC |
 | Validacao | FluentValidation 11 com validacao real de CNPJ |
 | Mapeamento | AutoMapper 12 |
@@ -134,7 +134,7 @@ Sobe 4 containers:
 |---|---|---|
 | `caseitau-sqlserver` | 1433 | SQL Server 2022 |
 | `caseitau-redis` | 6379 | Redis 7 (cache) |
-| `caseitau-api` | 5000 | API .NET 8 |
+| `caseitau-api` | 5000 | API .NET 10 |
 | `caseitau-frontend` | 4200 | Frontend Angular |
 
 O banco e criado automaticamente via EF Core Migrations na inicializacao da API, incluindo seed dos tipos de fundo (RENDA FIXA, ACOES, MULTI MERCADO) e feature flag do cache Redis.
@@ -249,7 +249,7 @@ dotnet test
 |---|---|---|---|
 | 1 | SQL Injection em todos os endpoints | Critica | EF Core com queries parametrizadas |
 | 2 | Connection Leak (SQLiteConnection sem Dispose) | Critica | DI com lifecycle gerenciado |
-| 3 | .NET Core 3.1 (sem suporte desde dez/2022) | Alta | .NET 8 LTS |
+| 3 | .NET Core 3.1 (sem suporte desde dez/2022) | Alta | .NET 10 |
 | 4 | SQLite em producao (sem concorrencia) | Alta | SQL Server 2022 |
 | 5 | Connection string hardcoded 6x | Alta | appsettings + DI |
 | 6 | Sem arquitetura (data access no controller) | Alta | Clean Architecture 4 camadas |
