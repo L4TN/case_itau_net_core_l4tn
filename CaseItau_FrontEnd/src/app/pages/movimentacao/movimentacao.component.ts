@@ -83,6 +83,15 @@ export class MovimentacaoComponent implements OnInit {
     });
   }
 
+  onValorKeyDown(event: KeyboardEvent): void {
+    const allowed = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Home', 'End'];
+    if (allowed.includes(event.key)) return;
+    if ((event.key === '-' || event.key === '+') && (event.target as HTMLInputElement).selectionStart === 0) return;
+    if (event.key === '.' && !(event.target as HTMLInputElement).value.includes('.')) return;
+    if (event.key >= '0' && event.key <= '9') return;
+    event.preventDefault();
+  }
+
   private loadMovimentacoes(): void {
     if (!this.selectedFundoCodigo) return;
     const useCache = this.cacheRedisFeatureEnabled && this.cacheRedis;
