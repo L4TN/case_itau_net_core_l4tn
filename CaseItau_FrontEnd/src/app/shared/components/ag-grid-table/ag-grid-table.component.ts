@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewChild, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AgGridModule, AgGridAngular } from 'ag-grid-angular';
 import { ColDef, GridApi, GridReadyEvent } from 'ag-grid-community';
@@ -14,7 +14,7 @@ import { TranslatePipe } from '../../../@core/pipes/translate.pipe';
     standalone: true,
     imports: [CommonModule, AgGridModule, NbCardModule, NbIconModule, NbButtonModule, TranslatePipe]
 })
-export class AgGridTableComponent implements OnInit {
+export class AgGridTableComponent implements OnInit, OnChanges {
     @ViewChild(AgGridAngular) agGrid!: AgGridAngular;
 
     @Input() columnDefs: ColDef[] = [];
@@ -25,6 +25,7 @@ export class AgGridTableComponent implements OnInit {
     @Input() localeText: any = {};
     @Input() formFields: FormFieldConfig[] = [];
     @Input() showTitle: boolean = true;
+    @Input() loading: boolean = false;
 
     @Output() onAdd = new EventEmitter<any>();
     @Output() onEdit = new EventEmitter<{ original: any; updated: any }>();
@@ -39,6 +40,9 @@ export class AgGridTableComponent implements OnInit {
         resizable: true,
     };
 
+    overlayLoadingTemplate = '<div class="ag-overlay-loading-center"><div class="loading-spinner"></div><span>Carregando...</span></div>';
+    overlayNoRowsTemplate = '<span>Nenhum registro encontrado.</span>';
+
     getRowStyle = (params: any) => {
         if (params.node.rowIndex % 2 === 0) {
             return { 'background-color': '#f0f0f0' };
@@ -47,6 +51,16 @@ export class AgGridTableComponent implements OnInit {
     };
 
     constructor(private dialogService: NbDialogService) {}
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['loading'] && this.gridApi) {
+            if (this.loading) {
+                this.gridApi.showLoadingOverlay();
+            } else {
+                this.gridApi.hideOverlay();
+            }
+        }
+    }
 
     ngOnInit(): void {
         if (this.columnDefs.length > 0) {

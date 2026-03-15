@@ -16,6 +16,7 @@ import { cnpjValidator } from '../../../@core/utils/cnpj.validator';
       title="Fundos"
       [columnDefs]="columnDefs"
       [rowData]="rowData"
+      [loading]="loading"
       [formFields]="formFields"
       (onAdd)="onAdd($event)"
       (onEdit)="onEdit($event)"
@@ -31,6 +32,7 @@ export class FundoComponent implements OnInit {
   columnDefs: ColDef[] = [];
   formFields: FormFieldConfig[] = [];
   rowData: FundoResponse[] = [];
+  loading: boolean = true;
 
   constructor(
     private fundoApi: FundoApiService,
@@ -70,8 +72,10 @@ export class FundoComponent implements OnInit {
   }
 
   loadData(): void {
+    this.loading = true;
     this.fundoApi.getAll().subscribe(data => {
       this.rowData = data;
+      this.loading = false;
       if (this.grid) this.grid.refreshData(data);
     });
   }

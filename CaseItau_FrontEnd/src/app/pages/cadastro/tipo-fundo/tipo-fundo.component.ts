@@ -11,6 +11,7 @@ import { TipoFundoApiService, TipoFundoResponse } from '../../../@core/services/
       title="Tipos de Fundo"
       [columnDefs]="columnDefs"
       [rowData]="rowData"
+      [loading]="loading"
       [formFields]="[]">
     </app-ag-grid-table>
   `,
@@ -20,6 +21,7 @@ import { TipoFundoApiService, TipoFundoResponse } from '../../../@core/services/
 export class TipoFundoComponent implements OnInit {
   columnDefs: ColDef[] = [];
   rowData: TipoFundoResponse[] = [];
+  loading: boolean = true;
 
   constructor(private tipoFundoApi: TipoFundoApiService) {}
 
@@ -31,6 +33,7 @@ export class TipoFundoComponent implements OnInit {
 
     this.tipoFundoApi.getAll().subscribe(data => {
       this.rowData = data;
+      this.loading = false;
     });
   }
 }

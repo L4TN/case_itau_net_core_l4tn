@@ -23,6 +23,7 @@ export class MovimentacaoComponent implements OnInit {
   cacheRedis: boolean = true;
   cacheRedisFeatureEnabled: boolean = false;
   movimentacoes: MovimentacaoResponse[] = [];
+  loadingGrid: boolean = false;
 
   columnDefs: ColDef[] = [
     { field: 'Id', headerName: 'Id', width: 80 },
@@ -85,8 +86,10 @@ export class MovimentacaoComponent implements OnInit {
   private loadMovimentacoes(): void {
     if (!this.selectedFundoCodigo) return;
     const useCache = this.cacheRedisFeatureEnabled && this.cacheRedis;
+    this.loadingGrid = true;
     this.movimentacaoApi.getMovimentacoes(this.selectedFundoCodigo, useCache).subscribe(data => {
       this.movimentacoes = data;
+      this.loadingGrid = false;
     });
   }
 }

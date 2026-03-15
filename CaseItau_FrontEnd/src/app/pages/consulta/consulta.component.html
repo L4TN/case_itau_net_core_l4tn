@@ -26,11 +26,15 @@
   </nb-card-body>
 </nb-card>
 
-<nb-card *ngIf="posicoes.length > 0">
+<nb-card *ngIf="posicoes.length > 0 || loadingGrid">
   <nb-card-header>
     <h5>Histórico de Posições</h5>
   </nb-card-header>
-  <ag-grid-angular
+  <nb-card-body *ngIf="loadingGrid" class="loading-container">
+    <div class="loading-spinner"></div>
+    <span>Carregando...</span>
+  </nb-card-body>
+  <ag-grid-angular *ngIf="!loadingGrid"
     class="ag-theme-alpine"
     [domLayout]="'autoHeight'"
     [columnDefs]="columnDefs"
