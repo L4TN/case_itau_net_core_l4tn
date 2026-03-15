@@ -130,6 +130,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<ExceptionMiddleware>();
+app.UseMiddleware<IdempotencyMiddleware>();
 app.UseCors("AllowAngular");
 app.UseHttpsRedirection();
 app.UseRateLimiter();
