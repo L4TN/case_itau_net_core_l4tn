@@ -1,34 +1,45 @@
-# Case Itau Asset Management
+# Case de engenharia Itau - .Net (Itau Asset Management)
 
-Case tecnico para a vaga de Desenvolvedor Pleno no Itau Asset Management.
+Este fork consiste no desafio recebido de um backend legado (.NET Core 3.1 com SQLite) contendo uma API de fundos.
 
-O desafio consistia em receber um backend legado (.NET Core 3.1 com SQLite) contendo uma API de fundos com diversos problemas de qualidade, seguranca e arquitetura, e refatora-lo aplicando boas praticas, corrigir o bug reportado, e criar um frontend que consuma a API.
+Os pontos propostos foram:
+
+- O código da API de fundos apresenta uso inadequado de objetos, não segue boas práticas e possui baixa qualidade.  
+  Refatore a aplicação utilizando boas práticas de desenvolvimento, bibliotecas adequadas, padrões de projeto e mecanismos que garantam a qualidade do software.  
+  Fique à vontade para utilizar outros componentes e até mesmo outro banco de dados, caso julgue necessário.
+- Após a inclusão de um novo fundo via API, os métodos `GET` da API de fundos passam a retornar erro.  
+  Identifique a causa do problema e implemente a devida correção.
+- Crie uma aplicação web, em **Angular** ou **ASP.NET MVC**, que consuma todos os métodos da API de fundos.
 
 ---
 
-## O que foi entregue
+## O que desenvolvi ?
 
-### 1. Refatoracao completa do backend
+### 1. Refatorei o backend
 
-O codigo legado tinha um unico controller com SQL inline, SQL Injection em todos os endpoints, connection leak, sem validacao, sem autenticacao, sem testes e sem arquitetura. Foi migrado para Clean Architecture com .NET 10, SQL Server, EF Core, JWT, Redis, testes unitarios e Docker.
+O código legado tinha diversas controllers com SQL Injection declarado direto no código em todos os endpoints, connection leak, sem validações, sem autenticação, sem testes e sem arquitetura. Decidi migrar para a Clean Architecture (por ser um case pequeno e a Clean não ser tão complexa), com .NET 10, SQL Server, EF Core, JWT, Redis, testes unitários para cobertura e Docker.
 
-### 2. Bug corrigido
+### 2. Bug relatado corrigido
 
-**Problema reportado:** "Apos a inclusao de um novo fundo via API, os metodos GET estao retornando erro."
+No exercício proposto, foi descrito que após a inclusão de um novo fundo via API, os métodos GET estão retornando erro.
 
-**Causa raiz:** O POST inseria `NULL` na coluna `PATRIMONIO`. O GET fazia `decimal.Parse(reader[4].ToString())` — quando `PATRIMONIO` era NULL, `reader[4].ToString()` retornava string vazia, e `decimal.Parse("")` lancava `FormatException`, crasheando a API para todos os fundos.
+Olhando o código inicial e depurando, fica claro que o "POST" inseria `NULL` na coluna `PATRIMONIO`.
 
-**Solucao:** Alem de corrigir o parse, a coluna `PATRIMONIO` foi removida da tabela `FUNDO` e substituida por duas novas tabelas (`Tb_Movimentacao_Fundo` e `Tb_Posicao_Fundo`) que registram cada movimentacao individualmente e mantem o historico de posicao diaria do patrimonio. Isso elimina o bug na raiz e adiciona rastreabilidade completa.
+Em em seguida era realizado o GET fazia `decimal.Parse(reader[4].ToString())`, quando `PATRIMONIO` era NULL, `reader[4].ToString()` retornava string vazia, e `decimal.Parse("")` lançava `FormatException`, lançando erro na API para todos os fundos.
+
+**Indo além:** Além de corrigir o parse, também foi revista a modelagem para aproximá-la de um cenário real de negócio. A coluna `PATRIMONIO` foi removida da tabela `FUNDO`, pois armazenava um valor agregado e mutável em uma entidade que deveria representar apenas os dados cadastrais do fundo. Em seu lugar, foram criadas duas novas tabelas: `Tb_Movimentacao_Fundo`, responsável por registrar cada movimentação individualmente, e `Tb_Posicao_Fundo`, responsável por manter o histórico diário de posição patrimonial.
+
+Essa mudança traz dois ganhos importantes: primeiro, **normaliza** a origem do dado, fazendo com que o patrimônio passe a ser derivado das movimentações em vez de persistido de forma redundante no cadastro do fundo; segundo, introduz uma **desnormalização controlada** por meio da tabela de posição diária, que armazena snapshots consolidados para facilitar consultas, melhorar performance e preservar rastreabilidade histórica. Com isso, o bug é eliminado na raiz e o modelo passa a refletir melhor a evolução patrimonial do fundo ao longo do tempo, além de permitir a exibição no FrontEnd desses dados históricos.
 
 ### 3. Frontend Angular
 
-Aplicacao web em Angular 15 (Nebular/ngx-admin) que consome todos os endpoints da API: autenticacao, cadastro de fundos, movimentacao patrimonial, consulta de posicoes e tipos de fundo.
+Aplicação web em Angular 15 (utilizei o Nebular/ngx-admin por ser um Design System completo) que consome todos os endpoints da API: autenticação, cadastro de fundos, movimentação patrimonial, consulta de posições e tipos de fundo.
 
 ---
 
-## Refatoracao do Modelo de Dados
+## Refatoração do Modelo de Dados (MER)
 
-O modelo legado tinha apenas 2 tabelas (`TIPO_FUNDO` e `FUNDO`) com o patrimonio armazenado como uma coluna `NUMERIC` na propria tabela de fundos, sem historico nem rastreabilidade.
+Como dito acima, o modelo legado tinha apenas 2 tabelas (`TIPO_FUNDO` e `FUNDO`) com o patrimonio armazenado como uma coluna `NUMERIC` na propria tabela de fundos, sem historico nem rastreabilidade.
 
 O novo modelo normaliza os dados em 5 tabelas:
 
@@ -44,28 +55,28 @@ Tb_Tipo_Fundo          Tipos de fundo (RENDA FIXA, ACOES, MULTI MERCADO)
 Tb_Feature_Flag        Feature flags para toggle de funcionalidades (ex: cache Redis)
 ```
 
-**O que mudou:**
+**O que mudou em relação ao Case proposto: (MER)** 
 
 | Aspecto | Legado | Refatorado |
 |---|---|---|
-| Patrimonio | Coluna `NUMERIC` na tabela `FUNDO` | Tabela `Tb_Posicao_Fundo` com snapshot diario |
-| Movimentacoes | `UPDATE FUNDO SET PATRIMONIO = PATRIMONIO + valor` | Tabela `Tb_Movimentacao_Fundo` com registro individual |
-| Historico | Sem historico, so o valor atual | Evolucao patrimonial dia a dia |
-| Concorrencia | Nenhuma | `RowVersion` na posicao para controle otimista |
+| Patrimônio | Coluna `NUMERIC` na tabela `FUNDO` | Tabela `Tb_Posicao_Fundo` com snapshot diario |
+| Movimentações | `UPDATE FUNDO SET PATRIMONIO = PATRIMONIO + valor` | Tabela `Tb_Movimentacao_Fundo` com registro individual |
+| Histórico | Sem histórico, só o valor atual | Evolução patrimônial dia a dia |
+| concorrência | Nenhuma | `RowVersion` na posição para controle de duplicatas |
 | Tipos de fundo | Existia no banco mas sem entidade C# | Entidade `TbTipoFundo` com navegacao |
 
 ---
 
-## Arquitetura
+## Arquitetura Clean Architecture
 
-O backend segue **Clean Architecture** com 4 camadas e dependencias unidirecionais:
+O backend contém 4 camadas e dependências unidirecionais:
 
 ```
 CaseItau_Backend/
 ├── src/
-│   ├── CaseItau.API           -> Apresentacao (Controllers, Middlewares, DI, Swagger)
-│   ├── CaseItau.Application   -> Logica de aplicacao (Services, DTOs, Validators, AutoMapper)
-│   ├── CaseItau.Domain        -> Dominio (Entidades, Interfaces, Excecoes)
+│   ├── CaseItau.API           -> Apresentação (Controllers, Middlewares, DI, Swagger)
+│   ├── CaseItau.Application   -> Lógica de aplicação (Services, DTOs, Validators, AutoMapper)
+│   ├── CaseItau.Domain        -> Domínio (Entidades, Interfaces, Excecoes)
 │   └── CaseItau.Infra         -> Infraestrutura (EF Core, SQL Server, Repositorios, Migrations)
 └── tests/
     └── CaseItau.Tests         -> Testes unitarios (xUnit, Moq, FluentAssertions)
@@ -73,6 +84,7 @@ CaseItau_Backend/
 CaseItau_FrontEnd/             -> Frontend Angular 15 (Nebular/ngx-admin)
 ```
 
+### Fluxo de dependências:
 ```
 API -> Application -> Domain
 Infra -> Domain
@@ -81,30 +93,30 @@ Tests -> Application, Domain
 
 ---
 
-## Stack Tecnologica
+## Stack Tecnológica
 
 ### Backend
 
 | Categoria | Tecnologia |
 |---|---|
-| Runtime | .NET 10 |
+| Runtime | .NET 10 (LTS)|
 | Banco de dados | SQL Server 2022 |
 | ORM | Entity Framework Core 10 com Fluent API |
-| Autenticacao | JWT Bearer com criptografia AES-256-CBC |
-| Validacao | FluentValidation 11 com validacao real de CNPJ |
+| Autenticação | JWT Bearer com criptografia AES-256-CBC |
+| Validação | FluentValidation 11 com validação real de CNPJ |
 | Mapeamento | AutoMapper 12 |
 | Cache | Redis 7 com Polly (Retry + Circuit Breaker) |
 | Logging | Serilog com sink para Console e AWS CloudWatch |
-| Documentacao | Swagger / Swashbuckle com suporte a JWT |
+| Documentação | Swagger / Swashbuckle com suporte a JWT |
 | Testes | xUnit, Moq, FluentAssertions — 56 testes |
-| Containerizacao | Docker + Docker Compose |
-| CI/CD | GitHub Actions |
-| Resiliencia | Polly 8 (Retry com backoff exponencial + Circuit Breaker) |
+| Containerização | Docker + Docker Compose |
+| CI/CD | GitHub Actions (Para rodar os testes)|
+| Resiliência | Polly 8 (Retry com backoff exponencial + Circuit Breaker) |
 | Rate Limiting | Fixed Window (100 req/min) |
 | Health Checks | SQL Server + Redis |
-| Idempotencia | Middleware com cache Redis (24h) |
+| Idempotência | Middleware com cache Redis (24h) |
 | Feature Flags | CRUD via API com toggle |
-| Concorrencia | RowVersion (optimistic concurrency) nas posicoes |
+| Concorrência | RowVersion (optimistic concurrency) nas posicoes |
 
 ### Frontend
 
@@ -116,9 +128,9 @@ Tests -> Application, Domain
 
 ---
 
-## Como Executar
+## Setup - Como Executar o Case
 
-### Pre-requisitos
+### Pré-requisitos
 
 - [Docker](https://www.docker.com/) com Docker Compose
 
@@ -137,7 +149,7 @@ Sobe 4 containers:
 | `caseitau-api` | 5000 | API .NET 10 |
 | `caseitau-frontend` | 4200 | Frontend Angular |
 
-O banco e criado automaticamente via EF Core Migrations na inicializacao da API, incluindo seed dos tipos de fundo (RENDA FIXA, ACOES, MULTI MERCADO) e feature flag do cache Redis.
+O banco é criado automaticamente via EF Core Migrations na inicialização da API, incluindo seed dos tipos de fundo (RENDA FIXA, ACOES, MULTI MERCADO) e feature flag do cache Redis.
 
 ### Acessando os servicos
 
@@ -158,7 +170,7 @@ dotnet build
 dotnet run --project src/CaseItau.API
 ```
 
-Requer SQL Server e Redis rodando localmente (ou suba apenas a infra via Docker):
+Requer SQL Server e Redis rodando localmente (ou suba apenas a infra via Docker, é mais fácil):
 
 ```bash
 docker compose up sqlserver redis -d
@@ -178,9 +190,9 @@ Acesse http://localhost:4200
 
 ## Endpoints da API
 
-### Autenticacao
+### Autenticação
 
-| Metodo | Rota | Descricao |
+| Método | Rota | Descrição |
 |---|---|---|
 | POST | `/api/auth/login` | Autentica e retorna token JWT criptografado (publico) |
 
@@ -188,7 +200,7 @@ Credenciais: `admin` / `admin123`
 
 ### Fundos (requer JWT)
 
-| Metodo | Rota | Descricao |
+| Método | Rota | Descrição |
 |---|---|---|
 | GET | `/api/fundo` | Lista todos os fundos (suporta `?page=1&pageSize=20`) |
 | GET | `/api/fundo/{codigo}` | Retorna detalhes de um fundo pelo codigo |
@@ -198,7 +210,7 @@ Credenciais: `admin` / `admin123`
 
 ### Movimentacoes (requer JWT)
 
-| Metodo | Rota | Descricao |
+| Método | Rota | Descrição |
 |---|---|---|
 | POST | `/api/movimentacao/{codigoFundo}` | Registra aporte ou resgate no patrimonio |
 | GET | `/api/movimentacao/{codigoFundo}` | Lista historico de movimentacoes |
@@ -206,13 +218,14 @@ Credenciais: `admin` / `admin123`
 
 ### Tipos de Fundo (requer JWT)
 
-| Metodo | Rota | Descricao |
+| Método | Rota | Descrição |
 |---|---|---|
 | GET | `/api/tipofundo` | Lista tipos de fundo cadastrados |
 
-### Feature Flags
+### Feature Flags (Configurações registradas em uma Tabela no banco)
+As feature flags permitem habilitar ou desabilitar funcionalidades dinamicamente sem necessidade de re-deploy.
 
-| Metodo | Rota | Descricao |
+| Método | Rota | Descrição |
 |---|---|---|
 | GET | `/api/featureflag` | Lista todas as flags (requer JWT) |
 | GET | `/api/featureflag/{chave}/enabled` | Verifica se esta habilitada (publico) |
@@ -220,7 +233,7 @@ Credenciais: `admin` / `admin123`
 
 ### Health Check
 
-| Metodo | Rota | Descricao |
+| Método | Rota | Descrição |
 |---|---|---|
 | GET | `/health` | Status do SQL Server e Redis (publico) |
 
@@ -228,7 +241,7 @@ Credenciais: `admin` / `admin123`
 
 ## Testes
 
-56 testes unitarios cobrindo a camada de aplicacao:
+56 testes unitarios cobrindo a camada de aplicação (Services, Validators, Mappings) com xUnit, Moq e FluentAssertions.:
 
 ```bash
 cd CaseItau_Backend
@@ -243,44 +256,19 @@ dotnet test
 
 ---
 
-## Problemas identificados e corrigidos no legado
+## Configuração por Ambiente
 
-| # | Problema | Severidade | Solucao aplicada |
-|---|---|---|---|
-| 1 | SQL Injection em todos os endpoints | Critica | EF Core com queries parametrizadas |
-| 2 | Connection Leak (SQLiteConnection sem Dispose) | Critica | DI com lifecycle gerenciado |
-| 3 | .NET Core 3.1 (sem suporte desde dez/2022) | Alta | .NET 10 |
-| 4 | SQLite em producao (sem concorrencia) | Alta | SQL Server 2022 |
-| 5 | Connection string hardcoded 6x | Alta | appsettings + DI |
-| 6 | Sem arquitetura (data access no controller) | Alta | Clean Architecture 4 camadas |
-| 7 | Sem validacao de input | Alta | FluentValidation + CNPJ real |
-| 8 | Sem autenticacao | Alta | JWT Bearer + AES-256-CBC |
-| 9 | Sem testes | Alta | 56 testes unitarios |
-| 10 | Bug: `decimal.Parse(null)` no GET apos POST | Media | Tabela separada de posicoes |
-| 11 | Sem DTOs (entidade exposta na API) | Media | DTOs de request/response |
-| 12 | Sem tratamento de erro | Media | ExceptionMiddleware centralizado |
-| 13 | Sem async/await | Media | Todos os endpoints async |
-| 14 | POST retorna void | Media | Retorna 201 Created |
-| 15 | GET retorna null | Media | Retorna 404 Not Found |
-| 16 | Sem CORS | Media | CORS configurado para Angular |
-| 17 | Sem Swagger | Baixa | Swagger com suporte a JWT |
-| 18 | Patrimonio como coluna unica | Design | Tabelas de movimentacao e posicao |
-
----
-
-## Configuracao por Ambiente
-
-| Arquivo | Ambiente | Caracteristicas |
+| Arquivo | Ambiente | Características |
 |---|---|---|
 | `appsettings.json` | Base | Connection string, JWT, Redis |
-| `appsettings.Development.json` | Dev | Debug logging, JWT 120min, `Database:ResetOnStartup` |
+| `appsettings.Development.json` | Dev | Debug logging, JWT 120min, `Configuração Database:ResetOnStartup` |
 | `appsettings.Staging.json` | UAT | Placeholders para CI/CD |
-| `appsettings.Production.json` | Producao | Warning logging, JWT 30min, CloudWatch habilitado |
+| `appsettings.Production.json` | Produção | Warning logging, JWT 30min, CloudWatch habilitado |
 
 ---
 
-## Postman
+## Postman (Faça Download e Importe)
 
 A collection `CaseItau_Backend/CaseItau.postman_collection.json` inclui todos os endpoints com scripts que salvam o token automaticamente.
 
-Importe o environment `CaseItau_Backend/CaseItau.postman_environment.json` para as variaveis pre-configuradas.
+Baixe e Importe o environment `CaseItau_Backend/CaseItau.postman_environment.json` para as variaveis pre-configuradas.
