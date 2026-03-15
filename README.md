@@ -166,3 +166,23 @@ cd CaseItau_Backend && dotnet test
 ```
 
 56 testes unitários: 37 services, 16 validators, 3 mappings.
+
+---
+
+## Screenshots
+
+**Login**
+
+<img width="1901" height="940" alt="Login" src="https://github.com/user-attachments/assets/7ae397d4-7aa5-4649-86a3-f7a15ed2b8ed" />
+
+**CRUD de Fundos**
+
+<img width="1901" height="566" alt="CRUD de Fundos" src="https://github.com/user-attachments/assets/ff17b269-31c0-42a3-967f-c6d167ba9f29" />
+
+**Movimentação**
+
+<img width="1900" height="934" alt="Movimentação" src="https://github.com/user-attachments/assets/b00b0139-849e-44a0-8d1d-a09d99819d11" />
+
+**Posição Patrimonial**
+
+<img width="1919" height="1079" alt="Posição Patrimonial" src="https://github.com/user-attachments/assets/00c7705c-6108-400f-8776-ad55583fc2ec" />
