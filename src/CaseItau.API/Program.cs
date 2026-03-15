@@ -1,8 +1,10 @@
+using System.Threading.RateLimiting;
 using AWS.Logger;
 using AWS.Logger.SeriLog;
 using CaseItau.API.Extensions;
 using CaseItau.API.Middlewares;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -84,6 +86,30 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter("fixed", opt =>
+    {
+        opt.PermitLimit = 100;
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.ContentType = "application/json";
+        await context.HttpContext.Response.WriteAsJsonAsync(new
+        {
+            StatusCode = 429,
+            Message = "Limite de requisições excedido. Tente novamente em 1 minuto.",
+            Timestamp = DateTime.UtcNow
+        }, cancellationToken);
+    };
+});
+
 builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
@@ -96,6 +122,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors("AllowAngular");
+app.UseHttpsRedirection();
+app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
