@@ -19,7 +19,7 @@ import { NotificationService } from '../../@core/services/notification.service';
 export class MovimentacaoComponent implements OnInit {
   fundos: FundoResponse[] = [];
   selectedFundoCodigo: string = '';
-  valor: number | null = null;
+  valorTexto: string = '';
   cacheRedis: boolean = true;
   cacheRedisFeatureEnabled: boolean = false;
   movimentacoes: MovimentacaoResponse[] = [];
@@ -69,12 +69,13 @@ export class MovimentacaoComponent implements OnInit {
   }
 
   movimentar(): void {
-    if (!this.selectedFundoCodigo || !this.valor) return;
+    const valor = parseFloat(this.valorTexto);
+    if (!this.selectedFundoCodigo || isNaN(valor)) return;
 
-    this.movimentacaoApi.movimentar(this.selectedFundoCodigo, { Valor: this.valor }).subscribe({
+    this.movimentacaoApi.movimentar(this.selectedFundoCodigo, { Valor: valor }).subscribe({
       next: () => {
         this.notification.success('Movimentação realizada com sucesso.');
-        this.valor = null;
+        this.valorTexto = '';
         this.loadMovimentacoes();
       },
       error: (err) => {
@@ -86,8 +87,11 @@ export class MovimentacaoComponent implements OnInit {
   onValorKeyDown(event: KeyboardEvent): void {
     const allowed = ['Backspace', 'Tab', 'ArrowLeft', 'ArrowRight', 'Delete', 'Home', 'End'];
     if (allowed.includes(event.key)) return;
-    if ((event.key === '-' || event.key === '+') && (event.target as HTMLInputElement).selectionStart === 0) return;
-    if (event.key === '.' && !(event.target as HTMLInputElement).value.includes('.')) return;
+    const input = event.target as HTMLInputElement;
+    const value = input.value;
+    const pos = input.selectionStart ?? 0;
+    if ((event.key === '-' || event.key === '+') && pos === 0 && !value.match(/^[+\-]/)) return;
+    if (event.key === '.' && !value.includes('.')) return;
     if (event.key >= '0' && event.key <= '9') return;
     event.preventDefault();
   }
