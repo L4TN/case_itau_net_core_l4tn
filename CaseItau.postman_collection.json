@@ -1,0 +1,382 @@
+{
+  "info": {
+    "_postman_id": "c54528df-8251-4334-a763-fe319bbb5a52",
+    "name": "Case Itau - API de Fundos",
+    "description": "Collection para a API de gerenciamento de fundos de investimento - Case tecnico Itau Asset Management.\n\nFluxo:\n1. Execute o Login para obter o token JWT\n2. O token e salvo automaticamente na variavel {{token}}\n3. Use as demais rotas normalmente (o token e enviado no header Authorization)\n\nObs: A API usa PascalCase no JSON (PropertyNamingPolicy = null).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "16593798"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (Obter Token JWT)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('token', jsonData.Token);",
+                  "    console.log('Token salvo com sucesso! Expira em: ' + jsonData.Expiration);",
+                  "}",
+                  ""
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Usuario\": \"admin\",\n  \"Senha\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Autentica com usuario e senha e retorna um token JWT.\n\nCredenciais padrao:\n- Usuario: admin\n- Senha: admin123\n\nO token e salvo automaticamente na variavel {{token}}."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Fundos (Cadastro)",
+      "item": [
+        {
+          "name": "Listar Todos os Fundos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/fundo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fundo"
+              ]
+            },
+            "description": "Retorna a lista de todos os fundos cadastrados, ordenados por nome."
+          },
+          "response": []
+        },
+        {
+          "name": "Buscar Fundo por Codigo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/fundo/ITAUAC546",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fundo",
+                "ITAUAC546"
+              ]
+            },
+            "description": "Retorna os detalhes de um fundo especifico pelo codigo."
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Novo Fundo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Codigo\": \"NOVOFUNDO01\",\n  \"Nome\": \"Fundo Teste Postman\",\n  \"Cnpj\": \"11222333000181\",\n  \"TipoFundoId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/fundo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fundo"
+              ]
+            },
+            "description": "Cadastra um novo fundo de investimento.\n\nCampos obrigatorios (PascalCase):\n- Codigo: Codigo unico do fundo (max. 20 caracteres)\n- Nome: Nome do fundo (max. 100 caracteres)\n- Cnpj: CNPJ valido do fundo (14 digitos com checksum)\n- TipoFundoId: ID do tipo de fundo (1=Renda Fixa, 2=Acoes, 3=Multi Mercado)"
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar Fundo",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Nome\": \"Fundo Atualizado via Postman\",\n  \"Cnpj\": \"11222333000181\",\n  \"TipoFundoId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/fundo/NOVOFUNDO01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fundo",
+                "NOVOFUNDO01"
+              ]
+            },
+            "description": "Atualiza os dados de um fundo existente.\n\nCampos (PascalCase):\n- Nome: Novo nome do fundo\n- Cnpj: Novo CNPJ (validado)\n- TipoFundoId: Novo tipo de fundo"
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar Fundo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/fundo/NOVOFUNDO01",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "fundo",
+                "NOVOFUNDO01"
+              ]
+            },
+            "description": "Exclui um fundo pelo codigo. Deleta em cascata posicoes e movimentacoes relacionadas."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tipos de Fundo",
+      "item": [
+        {
+          "name": "Listar Tipos de Fundo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tipofundo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "tipofundo"
+              ]
+            },
+            "description": "Retorna a lista de todos os tipos de fundo cadastrados (Renda Fixa, Acoes, Multi Mercado)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Movimentacoes (Consulta)",
+      "item": [
+        {
+          "name": "Movimentar Patrimonio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Valor\": 50000.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/movimentacao/ITAURF001",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movimentacao",
+                "ITAURF001"
+              ]
+            },
+            "description": "Registra uma movimentacao de patrimonio para um fundo.\n\nValor positivo: aporte (aumenta patrimonio)\nValor negativo: resgate (diminui patrimonio)\n\nRetorna a posicao atualizada do fundo.\nInvalida cache Redis do fundo."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Movimentacoes de um Fundo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/movimentacao/ITAURF001?cacheRedis=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movimentacao",
+                "ITAURF001"
+              ],
+              "query": [
+                {
+                  "key": "cacheRedis",
+                  "value": "true",
+                  "description": "true = usa cache Redis, false = busca direto do banco"
+                }
+              ]
+            },
+            "description": "Retorna todas as movimentacoes de um fundo pelo codigo.\n\nQuery params:\n- cacheRedis: true/false (habilita cache Redis)"
+          },
+          "response": []
+        },
+        {
+          "name": "Evolucao Patrimonial de um Fundo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/movimentacao/ITAURF001/evolucao-patrimonial?cacheRedis=true",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movimentacao",
+                "ITAURF001",
+                "evolucao-patrimonial"
+              ],
+              "query": [
+                {
+                  "key": "cacheRedis",
+                  "value": "true",
+                  "description": "true = usa cache Redis, false = busca direto do banco"
+                }
+              ]
+            },
+            "description": "Retorna a evolucao patrimonial (posicoes diarias) de um fundo.\nUsado pelo frontend para gerar o grafico de evolucao.\n\nQuery params:\n- cacheRedis: true/false (habilita cache Redis)"
+          },
+          "response": []
+        },
+        {
+          "name": "Movimentar Patrimonio (Resgate)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"Valor\": -15000.00\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/movimentacao/ITAURF001",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "movimentacao",
+                "ITAURF001"
+              ]
+            },
+            "description": "Exemplo de resgate (valor negativo).\nO patrimonio nao pode ficar negativo — retorna 400 se tentar."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
