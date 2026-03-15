@@ -119,15 +119,7 @@ CaseItau_FrontEnd/             -> Frontend Angular 15 (Nebular/ngx-admin)
 
 ### Fluxo de dependências:
 
-```mermaid
-graph LR
-    API --> Application
-    Application --> Domain
-    Infra --> Domain
-    API --> Infra
-    Tests --> Application
-    Tests --> Domain
-```
+![Clean Architecture](https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F163415ba-cbed-4f04-8539-3bc1c3a6fef3_1938x1246.png)
 
 ---
 
