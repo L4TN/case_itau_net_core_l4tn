@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { NbAlertModule, NbInputModule, NbButtonModule, NbSpinnerModule } from '@nebular/theme';
 import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../@core/services/auth.service';
 
 interface LoginResponse {
   Token: string;
@@ -35,6 +36,7 @@ export class LoginComponent {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private authService: AuthService,
   ) {}
 
   login(): void {
@@ -51,7 +53,7 @@ export class LoginComponent {
       Senha: this.senha,
     }).subscribe({
       next: (res) => {
-        localStorage.setItem('jwt_token', res.Token);
+        this.authService.saveSession(res.Token, res.Expiration);
         this.router.navigate(['/pages/cadastro']);
       },
       error: (err) => {
