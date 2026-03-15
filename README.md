@@ -39,7 +39,7 @@ Aplicação web em Angular 15 (utilizei o Nebular/ngx-admin por ser um Design Sy
 
 ## Refatoração do Modelo de Dados (MER)
 
-Como dito acima, o modelo legado tinha apenas 2 tabelas (`TIPO_FUNDO` e `FUNDO`) com o patrimonio armazenado como uma coluna `NUMERIC` na propria tabela de fundos, sem historico nem rastreabilidade.
+Como dito acima, o modelo legado tinha apenas 2 tabelas (`TIPO_FUNDO` e `FUNDO`) com o patrimônio armazenado como uma coluna `NUMERIC` na própria tabela de fundos, sem histórico nem rastreabilidade.
 
 O novo modelo normaliza os dados em 5 tabelas:
 
@@ -92,11 +92,11 @@ erDiagram
 
 | Aspecto | Legado | Refatorado |
 |---|---|---|
-| Patrimônio | Coluna `NUMERIC` na tabela `FUNDO` | Tabela `Tb_Posicao_Fundo` com snapshot diario |
+| Patrimônio | Coluna `NUMERIC` na tabela `FUNDO` | Tabela `Tb_Posicao_Fundo` com snapshot diário |
 | Movimentações | `UPDATE FUNDO SET PATRIMONIO = PATRIMONIO + valor` | Tabela `Tb_Movimentacao_Fundo` com registro individual |
-| Histórico | Sem histórico, só o valor atual | Evolução patrimônial dia a dia |
-| concorrência | Nenhuma | `RowVersion` na posição para controle de duplicatas |
-| Tipos de fundo | Existia no banco mas sem entidade C# | Entidade `TbTipoFundo` com navegacao |
+| Histórico | Sem histórico, só o valor atual | Evolução patrimonial dia a dia |
+| Concorrência | Nenhuma | `RowVersion` na posição para controle de duplicatas |
+| Tipos de fundo | Existia no banco mas sem entidade C# | Entidade `TbTipoFundo` com navegação |
 
 ---
 
@@ -109,10 +109,10 @@ CaseItau_Backend/
 ├── src/
 │   ├── CaseItau.API           -> Apresentação (Controllers, Middlewares, DI, Swagger)
 │   ├── CaseItau.Application   -> Lógica de aplicação (Services, DTOs, Validators, AutoMapper)
-│   ├── CaseItau.Domain        -> Domínio (Entidades, Interfaces, Excecoes)
-│   └── CaseItau.Infra         -> Infraestrutura (EF Core, SQL Server, Repositorios, Migrations)
+│   ├── CaseItau.Domain        -> Domínio (Entidades, Interfaces, Exceções)
+│   └── CaseItau.Infra         -> Infraestrutura (EF Core, SQL Server, Repositórios, Migrations)
 └── tests/
-    └── CaseItau.Tests         -> Testes unitarios (xUnit, Moq, FluentAssertions)
+    └── CaseItau.Tests         -> Testes unitários (xUnit, Moq, FluentAssertions)
 
 CaseItau_FrontEnd/             -> Frontend Angular 15 (Nebular/ngx-admin)
 ```
@@ -154,7 +154,7 @@ graph LR
 | Health Checks | SQL Server + Redis |
 | Idempotência | Middleware com cache Redis (24h) |
 | Feature Flags | CRUD via API com toggle |
-| Concorrência | RowVersion (optimistic concurrency) nas posicoes |
+| Concorrência | RowVersion (optimistic concurrency) nas posições |
 
 ### Frontend
 
@@ -180,18 +180,18 @@ docker compose up --build
 
 Sobe 4 containers:
 
-| Container | Porta | Descricao |
+| Container | Porta | Descrição |
 |---|---|---|
 | `caseitau-sqlserver` | 1433 | SQL Server 2022 |
 | `caseitau-redis` | 6379 | Redis 7 (cache) |
 | `caseitau-api` | 5000 | API .NET 10 |
 | `caseitau-frontend` | 4200 | Frontend Angular |
 
-O banco é criado automaticamente via EF Core Migrations na inicialização da API, incluindo seed dos tipos de fundo (RENDA FIXA, ACOES, MULTI MERCADO) e feature flag do cache Redis.
+O banco é criado automaticamente via EF Core Migrations na inicialização da API, incluindo seed dos tipos de fundo (RENDA FIXA, AÇÕES, MULTI MERCADO) e feature flag do cache Redis.
 
-### Acessando os servicos
+### Acessando os serviços
 
-| Servico | URL |
+| Serviço | URL |
 |---|---|
 | Swagger UI | http://localhost:5000/swagger |
 | Frontend | http://localhost:4200 |
@@ -232,7 +232,7 @@ Acesse http://localhost:4200
 
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/auth/login` | Autentica e retorna token JWT criptografado (publico) |
+| POST | `/api/auth/login` | Autentica e retorna token JWT criptografado (público) |
 
 Credenciais: `admin` / `admin123`
 
@@ -241,18 +241,18 @@ Credenciais: `admin` / `admin123`
 | Método | Rota | Descrição |
 |---|---|---|
 | GET | `/api/fundo` | Lista todos os fundos (suporta `?page=1&pageSize=20`) |
-| GET | `/api/fundo/{codigo}` | Retorna detalhes de um fundo pelo codigo |
+| GET | `/api/fundo/{codigo}` | Retorna detalhes de um fundo pelo código |
 | POST | `/api/fundo` | Cadastra um novo fundo |
 | PUT | `/api/fundo/{codigo}` | Edita um fundo existente |
 | DELETE | `/api/fundo/{codigo}` | Exclui um fundo |
 
-### Movimentacoes (requer JWT)
+### Movimentações (requer JWT)
 
 | Método | Rota | Descrição |
 |---|---|---|
-| POST | `/api/movimentacao/{codigoFundo}` | Registra aporte ou resgate no patrimonio |
-| GET | `/api/movimentacao/{codigoFundo}` | Lista historico de movimentacoes |
-| GET | `/api/movimentacao/{codigoFundo}/evolucao-patrimonial` | Evolucao diaria do patrimonio |
+| POST | `/api/movimentacao/{codigoFundo}` | Registra aporte ou resgate no patrimônio |
+| GET | `/api/movimentacao/{codigoFundo}` | Lista histórico de movimentações |
+| GET | `/api/movimentacao/{codigoFundo}/evolucao-patrimonial` | Evolução diária do patrimônio |
 
 ### Tipos de Fundo (requer JWT)
 
@@ -266,20 +266,20 @@ As feature flags permitem habilitar ou desabilitar funcionalidades dinamicamente
 | Método | Rota | Descrição |
 |---|---|---|
 | GET | `/api/featureflag` | Lista todas as flags (requer JWT) |
-| GET | `/api/featureflag/{chave}/enabled` | Verifica se esta habilitada (publico) |
+| GET | `/api/featureflag/{chave}/enabled` | Verifica se está habilitada (público) |
 | PUT | `/api/featureflag/{chave}/toggle?habilitado=true` | Habilita/desabilita (requer JWT) |
 
 ### Health Check
 
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/health` | Status do SQL Server e Redis (publico) |
+| GET | `/health` | Status do SQL Server e Redis (público) |
 
 ---
 
 ## Testes
 
-56 testes unitarios cobrindo a camada de aplicação (Services, Validators, Mappings) com xUnit, Moq e FluentAssertions.:
+56 testes unitários cobrindo a camada de aplicação (Services, Validators, Mappings) com xUnit, Moq e FluentAssertions:
 
 ```bash
 cd CaseItau_Backend
@@ -289,8 +289,8 @@ dotnet test
 | Categoria | Escopo | Testes |
 |---|---|---|
 | Services | FundoService, MovimentacaoService, TipoFundoService, FeatureFlagService | 37 |
-| Validators | CreateFundo, UpdateFundo, CreateMovimentacao, validacao de CNPJ | 16 |
-| Mappings | Configuracao do AutoMapper | 3 |
+| Validators | CreateFundo, UpdateFundo, CreateMovimentacao, validação de CNPJ | 16 |
+| Mappings | Configuração do AutoMapper | 3 |
 
 ---
 
@@ -299,7 +299,7 @@ dotnet test
 | Arquivo | Ambiente | Características |
 |---|---|---|
 | `appsettings.json` | Base | Connection string, JWT, Redis |
-| `appsettings.Development.json` | Dev | Debug logging, JWT 120min, `Configuração Database:ResetOnStartup` |
+| `appsettings.Development.json` | Dev | Debug logging, JWT 120min, configuração `Database:ResetOnStartup` |
 | `appsettings.Staging.json` | UAT | Placeholders para CI/CD |
 | `appsettings.Production.json` | Produção | Warning logging, JWT 30min, CloudWatch habilitado |
 
@@ -309,4 +309,4 @@ dotnet test
 
 A collection `CaseItau_Backend/CaseItau.postman_collection.json` inclui todos os endpoints com scripts que salvam o token automaticamente.
 
-Baixe e Importe o environment `CaseItau_Backend/CaseItau.postman_environment.json` para as variaveis pre-configuradas.
+Baixe e importe o environment `CaseItau_Backend/CaseItau.postman_environment.json` para as variáveis pré-configuradas.
