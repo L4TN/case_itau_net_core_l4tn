@@ -119,8 +119,9 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DboContext>();
+    db.Database.EnsureDeleted();
     db.Database.Migrate();
-    Log.Information("Migrations aplicadas com sucesso.");
+    Log.Information("Banco recriado e migrations aplicadas com sucesso.");
 }
 
 if (app.Environment.IsDevelopment())
