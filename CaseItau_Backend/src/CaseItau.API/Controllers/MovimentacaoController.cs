@@ -32,6 +32,8 @@ public class MovimentacaoController : ControllerBase
         _redisExpiration = TimeSpan.FromSeconds(configuration.GetValue<int>("Redis:ExpirationInSeconds", 60));
     }
 
+    #region POST
+
     [HttpPost("{codigoFundo}")]
     public async Task<ActionResult<PosicaoFundoResponseDto>> Post(string codigoFundo, [FromBody] CreateMovimentacaoRequestDto dto, CancellationToken cancellationToken)
     {
@@ -44,6 +46,10 @@ public class MovimentacaoController : ControllerBase
 
         return Created(string.Empty, posicao);
     }
+
+    #endregion
+
+    #region GET
 
     [HttpGet("{codigoFundo}/evolucao-patrimonial")]
     public async Task<ActionResult<IEnumerable<PosicaoFundoResponseDto>>> GetEvolucaoPatrimonial(
@@ -97,9 +103,15 @@ public class MovimentacaoController : ControllerBase
         return Ok(movimentacoes);
     }
 
+    #endregion
+
+    #region Private
+
     private async Task InvalidateRedisCacheAsync(string codigoFundo)
     {
         await _cacheService.RemoveAsync($"{RedisKeyMovimentacoesPrefix}{codigoFundo}");
         await _cacheService.RemoveAsync($"{RedisKeyPosicoesPrefix}{codigoFundo}");
     }
+
+    #endregion
 }

@@ -47,5 +47,12 @@ public class TbFundoMap : IEntityTypeConfiguration<TbFundo>
             .WithOne(p => p.Fundo)
             .HasForeignKey(p => p.FundoId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasData(
+            new { Id = 1, Codigo = "ITAU1", Nome = "Itaú Privilège RF DI", Cnpj = "26199519000134", TipoFundoId = 1 },
+            new { Id = 2, Codigo = "ITAU2", Nome = "Itaú Index Simples Selic RF FICFI", Cnpj = "36347721000110", TipoFundoId = 1 },
+            new { Id = 3, Codigo = "ITAU3", Nome = "Itaú Janeiro Multimercado FICFI", Cnpj = "52116227000109", TipoFundoId = 3 },
+            new { Id = 4, Codigo = "ITAU4", Nome = "Itaú Ações Momento 30 FICFI", Cnpj = "16718302000130", TipoFundoId = 2 }
+        );
     }
 }

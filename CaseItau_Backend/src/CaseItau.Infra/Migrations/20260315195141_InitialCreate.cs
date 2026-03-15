@@ -7,8 +7,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace CaseItau.Infra.Migrations
 {
+    /// <inheritdoc />
     public partial class InitialCreate : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -122,6 +124,17 @@ namespace CaseItau.Infra.Migrations
                     { 3, "MULTI MERCADO" }
                 });
 
+            migrationBuilder.InsertData(
+                table: "Tb_Fundo",
+                columns: new[] { "Id", "Nr_Cnpj", "Cd_Fundo", "Nm_Fundo", "Id_Tipo_Fundo" },
+                values: new object[,]
+                {
+                    { 1, "26199519000134", "ITAU1", "Itaú Privilège RF DI", 1 },
+                    { 2, "36347721000110", "ITAU2", "Itaú Index Simples Selic RF FICFI", 1 },
+                    { 3, "52116227000109", "ITAU3", "Itaú Janeiro Multimercado FICFI", 3 },
+                    { 4, "16718302000130", "ITAU4", "Itaú Ações Momento 30 FICFI", 2 }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Tb_Feature_Flag_Ds_Chave",
                 table: "Tb_Feature_Flag",
@@ -156,6 +169,7 @@ namespace CaseItau.Infra.Migrations
                 column: "Id_Fundo");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

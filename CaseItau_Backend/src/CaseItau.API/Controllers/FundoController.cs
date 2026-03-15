@@ -18,6 +18,8 @@ public class FundoController : ControllerBase
         _fundoService = fundoService;
     }
 
+    #region GET
+
     [HttpGet]
     public async Task<IActionResult> GetAllFunds([FromQuery] int? page, [FromQuery] int? pageSize, CancellationToken cancellationToken)
     {
@@ -40,12 +42,20 @@ public class FundoController : ControllerBase
         return Ok(fundo);
     }
 
+    #endregion
+
+    #region POST
+
     [HttpPost]
     public async Task<ActionResult<FundoResponseDto>> Post([FromBody] CreateFundoRequestDto dto, CancellationToken cancellationToken)
     {
         var fundo = await _fundoService.CreateAsync(dto, cancellationToken);
         return CreatedAtAction(nameof(GetFundByCodigo), new { codigo = fundo.CdFundo }, fundo);
     }
+
+    #endregion
+
+    #region PUT
 
     [HttpPut("{codigo}")]
     public async Task<ActionResult<FundoResponseDto>> Put(string codigo, [FromBody] UpdateFundoRequestDto dto, CancellationToken cancellationToken)
@@ -54,10 +64,16 @@ public class FundoController : ControllerBase
         return Ok(fundo);
     }
 
+    #endregion
+
+    #region DELETE
+
     [HttpDelete("{codigo}")]
     public async Task<IActionResult> Delete(string codigo, CancellationToken cancellationToken)
     {
         await _fundoService.DeleteAsync(codigo, cancellationToken);
         return NoContent();
     }
+
+    #endregion
 }

@@ -18,6 +18,8 @@ public class DiagnosticsController : ControllerBase
         _logger = logger;
     }
 
+    #region POST - Geração de Logs
+
     [HttpPost("logs/all-levels")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GenerateAllLogLevels()
@@ -37,6 +39,38 @@ public class DiagnosticsController : ControllerBase
             Timestamp = DateTime.UtcNow
         });
     }
+
+    [HttpPost("logs/bulk-errors")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public IActionResult GenerateBulkErrors([FromQuery] int count = 10)
+    {
+        var clamped = Math.Clamp(count, 1, 100);
+        var usuario = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "unknown";
+
+        for (var i = 1; i <= clamped; i++)
+        {
+            _logger.LogError(
+                "[DIAGNOSTICS] Erro simulado {ErrorNumber}/{Total} — Usuário: {Usuario} — " +
+                "Falha ao processar movimentação do fundo ITAU{FundoId:D3}. Timeout na consulta SQL após 5000ms.",
+                i, clamped, usuario, i);
+        }
+
+        _logger.LogWarning(
+            "[DIAGNOSTICS] Circuit Breaker ABERTO para Redis por 30s — {ErrorCount} falhas consecutivas. " +
+            "Fallback ativo: consultas diretas ao SQL Server. Usuário: {Usuario}",
+            clamped, usuario);
+
+        return Ok(new
+        {
+            Message = $"{clamped} logs de erro + 1 warning de circuit breaker gerados",
+            Usuario = usuario,
+            Timestamp = DateTime.UtcNow
+        });
+    }
+
+    #endregion
+
+    #region GET - Simulação de Erros
 
     [HttpGet("errors/not-found")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -80,31 +114,5 @@ public class DiagnosticsController : ControllerBase
             "Conexão com serviço externo de compliance timeout após 30s — operação cancelada.");
     }
 
-    [HttpPost("logs/bulk-errors")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult GenerateBulkErrors([FromQuery] int count = 10)
-    {
-        var clamped = Math.Clamp(count, 1, 100);
-        var usuario = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value ?? "unknown";
-
-        for (var i = 1; i <= clamped; i++)
-        {
-            _logger.LogError(
-                "[DIAGNOSTICS] Erro simulado {ErrorNumber}/{Total} — Usuário: {Usuario} — " +
-                "Falha ao processar movimentação do fundo ITAU{FundoId:D3}. Timeout na consulta SQL após 5000ms.",
-                i, clamped, usuario, i);
-        }
-
-        _logger.LogWarning(
-            "[DIAGNOSTICS] Circuit Breaker ABERTO para Redis por 30s — {ErrorCount} falhas consecutivas. " +
-            "Fallback ativo: consultas diretas ao SQL Server. Usuário: {Usuario}",
-            clamped, usuario);
-
-        return Ok(new
-        {
-            Message = $"{clamped} logs de erro + 1 warning de circuit breaker gerados",
-            Usuario = usuario,
-            Timestamp = DateTime.UtcNow
-        });
-    }
+    #endregion
 }
