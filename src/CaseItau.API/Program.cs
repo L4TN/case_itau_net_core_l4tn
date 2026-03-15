@@ -2,6 +2,7 @@ using AWS.Logger;
 using AWS.Logger.SeriLog;
 using CaseItau.API.Extensions;
 using CaseItau.API.Middlewares;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -98,6 +99,27 @@ app.UseCors("AllowAngular");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = new
+        {
+            Status = report.Status.ToString(),
+            Duration = report.TotalDuration.TotalMilliseconds + "ms",
+            Checks = report.Entries.Select(e => new
+            {
+                Name = e.Key,
+                Status = e.Value.Status.ToString(),
+                Duration = e.Value.Duration.TotalMilliseconds + "ms",
+                Description = e.Value.Description ?? ""
+            })
+        };
+        await context.Response.WriteAsJsonAsync(result);
+    }
+});
 
 app.UseSerilogRequestLogging();
 Log.Information("API Case Itau iniciada com sucesso.");

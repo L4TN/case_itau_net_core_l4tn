@@ -60,6 +60,20 @@ public static class DependencyInjection
 
         services.AddSingleton<IRedisCacheService, RedisCacheService>();
 
+        var healthChecksBuilder = services.AddHealthChecks()
+            .AddSqlServer(
+                configuration.GetConnectionString("DefaultConnection")!,
+                name: "sqlserver",
+                tags: new[] { "db", "sql" });
+
+        if (redisEnabled)
+        {
+            healthChecksBuilder.AddRedis(
+                redisConnectionString,
+                name: "redis",
+                tags: new[] { "cache", "redis" });
+        }
+
         var jwtKey = configuration["Jwt:Key"]!;
         var issuer = configuration["Jwt:Issuer"]!;
         var audience = configuration["Jwt:Audience"]!;
