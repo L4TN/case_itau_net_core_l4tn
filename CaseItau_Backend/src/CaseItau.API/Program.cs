@@ -120,15 +120,14 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<DboContext>();
 
-    //Descomente aqui para rodar a Migration
-    //if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Database:ResetOnStartup"))
-    //{
-    //    db.Database.EnsureDeleted();
-    //    Log.Warning("Banco de dados foi limpado e será re-criado, (pois Database:ResetOnStartup está true na config).");
-    //}
+    if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Database:ResetOnStartup"))
+    {
+        db.Database.EnsureDeleted();
+        Log.Warning("Banco de dados foi limpado e será re-criado, (pois Database:ResetOnStartup está true na config).");
+    }
 
-    //db.Database.Migrate();
-    //Log.Information("Migrations aplicadas com sucesso.");
+    db.Database.Migrate();
+    Log.Information("Migrations aplicadas com sucesso.");
 }
 
 if (app.Environment.IsDevelopment())
