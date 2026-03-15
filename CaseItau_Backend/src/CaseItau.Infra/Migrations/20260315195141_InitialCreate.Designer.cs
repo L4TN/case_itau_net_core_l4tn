@@ -12,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CaseItau.Infra.Migrations
 {
     [DbContext(typeof(DboContext))]
-    [Migration("20260315172347_AddRowVersionToPosicaoFundo")]
-    partial class AddRowVersionToPosicaoFundo
+    [Migration("20260315195141_InitialCreate")]
+    partial class InitialCreate
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
@@ -122,6 +123,40 @@ namespace CaseItau.Infra.Migrations
                     b.HasIndex("TipoFundoId");
 
                     b.ToTable("Tb_Fundo", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Cnpj = "26199519000134",
+                            Codigo = "ITAU1",
+                            Nome = "Itaú Privilège RF DI",
+                            TipoFundoId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Cnpj = "36347721000110",
+                            Codigo = "ITAU2",
+                            Nome = "Itaú Index Simples Selic RF FICFI",
+                            TipoFundoId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Cnpj = "52116227000109",
+                            Codigo = "ITAU3",
+                            Nome = "Itaú Janeiro Multimercado FICFI",
+                            TipoFundoId = 3
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Cnpj = "16718302000130",
+                            Codigo = "ITAU4",
+                            Nome = "Itaú Ações Momento 30 FICFI",
+                            TipoFundoId = 2
+                        });
                 });
 
             modelBuilder.Entity("CaseItau.Domain.Entities.TbMovimentacaoFundo", b =>

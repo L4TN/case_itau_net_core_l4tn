@@ -18,6 +18,8 @@ public class FeatureFlagController : ControllerBase
         _featureFlagService = featureFlagService;
     }
 
+    #region GET
+
     [HttpGet]
     public async Task<ActionResult<IEnumerable<FeatureFlagResponseDto>>> GetAll(CancellationToken cancellationToken)
     {
@@ -42,10 +44,16 @@ public class FeatureFlagController : ControllerBase
         return Ok(enabled);
     }
 
+    #endregion
+
+    #region PUT
+
     [HttpPut("{chave}/toggle")]
     public async Task<ActionResult<FeatureFlagResponseDto>> Toggle(string chave, [FromQuery] bool habilitado, CancellationToken cancellationToken)
     {
         var flag = await _featureFlagService.ToggleAsync(chave, habilitado, cancellationToken);
         return Ok(flag);
     }
+
+    #endregion
 }
