@@ -123,7 +123,7 @@ using (var scope = app.Services.CreateScope())
     if (app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Database:ResetOnStartup"))
     {
         db.Database.EnsureDeleted();
-        Log.Warning("Banco deletado (Database:ResetOnStartup=true).");
+        Log.Warning("Banco de dados foi limpado e será re-criado, (pois Database:ResetOnStartup está true na config).");
     }
 
     db.Database.Migrate();
