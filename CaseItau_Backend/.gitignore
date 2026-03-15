@@ -483,19 +483,3 @@ $RECYCLE.BIN/
 _legado_referencia/
 .vs/
 *.user
-
-# Frontend
-CaseItau_FrontEnd/node_modules/
-CaseItau_FrontEnd/dist/
-CaseItau_FrontEnd/.angular/
-
-# Legacy reference
-_legado_referencia/
-CaseItau_Backend/_legado_referencia/
-
-# Claude
-.claude/
-
-# VS
-.vs/
-*.user

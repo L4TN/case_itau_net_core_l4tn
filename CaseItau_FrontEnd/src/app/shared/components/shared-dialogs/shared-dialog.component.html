@@ -1,0 +1,111 @@
+<nb-card [ngClass]="mode === 'form' ? 'dialog-form' : 'dialog-confirm'">
+  <nb-card-header>
+    {{ dialogTitle }}
+    <button nbButton ghost status="danger" size="medium" (click)="cancel()"
+      style="float: right; margin-top: -5px;" type="button" tabindex="-1">
+      <nb-icon icon="close-outline"></nb-icon>
+    </button>
+  </nb-card-header>
+
+  <nb-card-body>
+
+    <!-- ========== MODE: FORM ========== -->
+    <ng-container *ngIf="mode === 'form'">
+      <form [formGroup]="form">
+        <div class="form-row">
+          <ng-container *ngFor="let field of fields">
+            <div class="form-group" [class.half-width]="field.halfWidth">
+
+              <label [for]="field.name">
+                {{ field.label }}
+                <span *ngIf="field.required" class="required">*</span>
+              </label>
+
+              <!-- TEXT / NUMBER / PASSWORD -->
+              <input *ngIf="field.type === 'text' || field.type === 'number' || field.type === 'password'"
+                nbInput fullWidth
+                [id]="field.name"
+                [formControlName]="field.name"
+                [type]="field.type"
+                [placeholder]="field.placeholder || ''"
+                [attr.maxlength]="field.maxLength || null"
+                (input)="onInput($event, field)"
+                [ngClass]="{'input-error': isInvalid(field.name)}">
+
+              <!-- TEXTAREA -->
+              <textarea *ngIf="field.type === 'textarea'"
+                nbInput fullWidth
+                [id]="field.name"
+                [formControlName]="field.name"
+                [placeholder]="field.placeholder || ''"
+                rows="3"
+                [ngClass]="{'input-error': isInvalid(field.name)}">
+              </textarea>
+
+              <!-- SELECT -->
+              <nb-select *ngIf="field.type === 'select'"
+                fullWidth
+                [id]="field.name"
+                [formControlName]="field.name"
+                [placeholder]="field.placeholder || ('dialog.selectPlaceholder' | translate)">
+                <nb-option *ngFor="let opt of field.options" [value]="opt.value">
+                  {{ opt.label }}
+                </nb-option>
+              </nb-select>
+
+              <!-- ERROR -->
+              <div *ngIf="isInvalid(field.name)" class="error-text">
+                {{ getErrorMessage(field) }}
+              </div>
+
+            </div>
+          </ng-container>
+        </div>
+      </form>
+    </ng-container>
+
+    <!-- ========== MODE: DELETE ========== -->
+    <ng-container *ngIf="mode === 'delete'">
+      <p *ngIf="count === 1">
+        {{ 'dialog.deleteSingle' | translate }} <strong>{{ title }}</strong>?
+      </p>
+      <p *ngIf="count > 1">
+        {{ 'dialog.deleteMultiple' | translate:{ count: count } }} <strong>{{ title }}</strong>?
+      </p>
+      <p class="warning-text">{{ 'dialog.cannotBeUndone' | translate }}</p>
+    </ng-container>
+
+    <!-- ========== MODE: EXPORT ========== -->
+    <ng-container *ngIf="mode === 'export'">
+      <p *ngIf="count > 0">
+        {{ 'dialog.exportSelected' | translate:{ count: count } }} <strong>{{ title }}</strong> {{ 'dialog.inCsv' | translate }}
+      </p>
+      <p *ngIf="count === 0">
+        {{ 'dialog.exportAll' | translate:{ total: total } }} <strong>{{ title }}</strong> {{ 'dialog.inCsv' | translate }}
+      </p>
+    </ng-container>
+
+  </nb-card-body>
+
+  <nb-card-footer>
+    <!-- FORM -->
+    <ng-container *ngIf="mode === 'form'">
+      <button nbButton status="basic" (click)="cancel()" style="margin-right: 8px;">{{ 'dialog.cancel' | translate }}</button>
+      <button nbButton [status]="buttonStatus" (click)="save()">
+        {{ isEditMode ? ('dialog.save' | translate) : ('dialog.create' | translate) }}
+      </button>
+    </ng-container>
+
+    <!-- DELETE -->
+    <ng-container *ngIf="mode === 'delete'">
+      <button nbButton status="basic" (click)="cancel()" style="margin-right: 8px;">{{ 'dialog.cancel' | translate }}</button>
+      <button nbButton [status]="buttonStatus" (click)="confirm()">{{ 'dialog.deleteAction' | translate }}</button>
+    </ng-container>
+
+    <!-- EXPORT -->
+    <ng-container *ngIf="mode === 'export'">
+      <button nbButton status="basic" (click)="cancel()" style="margin-right: 8px;">{{ 'dialog.cancel' | translate }}</button>
+      <button nbButton [status]="buttonStatus" (click)="confirm()">{{ 'dialog.exportAction' | translate }}</button>
+    </ng-container>
+  </nb-card-footer>
+</nb-card>

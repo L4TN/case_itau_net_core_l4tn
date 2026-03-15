@@ -1,0 +1,45 @@
+<nb-card>
+  <nb-card-header>
+    <h5>Posição — Evolução Patrimonial</h5>
+  </nb-card-header>
+  <nb-card-body>
+    <div class="selector-row">
+      <label class="label">Selecione um Fundo</label>
+      <nb-select placeholder="Selecione um fundo" fullWidth (selectedChange)="onFundoChange($event)">
+        <nb-option *ngFor="let f of fundos" [value]="f.CdFundo">
+          {{ f.CdFundo }} - {{ f.NmFundo }}
+        </nb-option>
+      </nb-select>
+    </div>
+    <div class="cache-row" *ngIf="cacheRedisFeatureEnabled">
+      <nb-checkbox [(ngModel)]="cacheRedis">Usar cache</nb-checkbox>
+    </div>
+  </nb-card-body>
+</nb-card>
+
+<nb-card *ngIf="posicoes.length > 0">
+  <nb-card-header>
+    <h5>{{ selectedFundoNome }} — Evolução Patrimonial</h5>
+  </nb-card-header>
+  <nb-card-body>
+    <div echarts [options]="chartOptions" class="chart"></div>
+  </nb-card-body>
+</nb-card>
+
+<nb-card *ngIf="posicoes.length > 0">
+  <nb-card-header>
+    <h5>Histórico de Posições</h5>
+  </nb-card-header>
+  <ag-grid-angular
+    class="ag-theme-alpine"
+    [domLayout]="'autoHeight'"
+    [columnDefs]="columnDefs"
+    [rowData]="posicoes"
+    [defaultColDef]="defaultColDef"
+    [getRowStyle]="getRowStyle"
+    [pagination]="true"
+    [paginationPageSize]="10"
+    [animateRows]="true"
+    [rowHeight]="48">
+  </ag-grid-angular>
+</nb-card>

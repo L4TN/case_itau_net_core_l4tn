@@ -1,0 +1,50 @@
+<nb-card>
+  <nb-card-header>
+    <h5>Movimentação de Fundos</h5>
+  </nb-card-header>
+  <nb-card-body>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="label">Fundo</label>
+        <nb-select placeholder="Selecione um fundo" fullWidth (selectedChange)="onFundoChange($event)">
+          <nb-option *ngFor="let f of fundos" [value]="f.CdFundo">
+            {{ f.CdFundo }} - {{ f.NmFundo }}
+          </nb-option>
+        </nb-select>
+      </div>
+      <div class="form-group valor-group">
+        <label class="label">Valor (positivo = aporte, negativo = resgate)</label>
+        <input nbInput type="number" fullWidth placeholder="Ex: 50000 ou -10000" [(ngModel)]="valor">
+      </div>
+      <div class="form-group btn-group">
+        <button nbButton status="info" [disabled]="!selectedFundoCodigo" (click)="consultar()">
+          <nb-icon icon="search-outline"></nb-icon> Consultar
+        </button>
+        <button nbButton status="primary" [disabled]="!selectedFundoCodigo || !valor" (click)="movimentar()">
+          <nb-icon icon="trending-up-outline"></nb-icon> Movimentar
+        </button>
+      </div>
+    </div>
+    <div class="cache-row" *ngIf="cacheRedisFeatureEnabled">
+      <nb-checkbox [(ngModel)]="cacheRedis">Usar cache</nb-checkbox>
+    </div>
+  </nb-card-body>
+</nb-card>
+
+<nb-card *ngIf="movimentacoes.length > 0">
+  <nb-card-header>
+    <h5>Histórico de Movimentações</h5>
+  </nb-card-header>
+  <ag-grid-angular
+    class="ag-theme-alpine"
+    [domLayout]="'autoHeight'"
+    [columnDefs]="columnDefs"
+    [rowData]="movimentacoes"
+    [defaultColDef]="defaultColDef"
+    [getRowStyle]="getRowStyle"
+    [pagination]="true"
+    [paginationPageSize]="10"
+    [animateRows]="true"
+    [rowHeight]="48">
+  </ag-grid-angular>
+</nb-card>
