@@ -3,8 +3,10 @@ using AWS.Logger;
 using AWS.Logger.SeriLog;
 using CaseItau.API.Extensions;
 using CaseItau.API.Middlewares;
+using CaseItau.Infra.Data;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
 
@@ -113,6 +115,13 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<DboContext>();
+    db.Database.Migrate();
+    Log.Information("Migrations aplicadas com sucesso.");
+}
 
 if (app.Environment.IsDevelopment())
 {
